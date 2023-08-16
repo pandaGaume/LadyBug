@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "name": "Win64",
+      "includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/platforms/win/include"
+      ],
+      "defines": ["_DEBUG"],
+      "windowsSdkVersion": "10.0.19041.0",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-msvc-x64"
+    }
+  ],
+  "version": 4
+}

@@ -1,0 +1,25 @@
+{
+  "tasks": [
+    {
+      "label": "Compile Debug",
+      "type": "shell",
+      "command": "mingw32-make",
+      "args": ["compile", "DEBUG=true"],
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Clean Debug",
+      "type": "shell",
+      "command": "mingw32-make",
+      "args": ["DEBUG=true", "clean"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Recompile Debug",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Clean Debug", "Compile Debug"],
+      "problemMatcher": []
+    }
+  ],
+  "version": "2.0.0"
+}
