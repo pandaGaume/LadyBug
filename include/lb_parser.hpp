@@ -119,6 +119,7 @@ namespace BlueSteelLadyBug
         PBSubReader(PBReader *r, lb_uint16_t depth, size_t from, size_t length) : _sv(r->getInput(), from, length)
         {
             _status.depth = depth;
+            _input = &_sv;
         }
 
     private:
