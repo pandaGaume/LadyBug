@@ -6,7 +6,7 @@
 
 namespace BlueSteelLadyBug
 {
-    class MemoryStream : IInputStream
+    class MemoryStream : public IInputStream
     {
     public:
         MemoryStream(lb_byte_t *buffer, size_t size)
@@ -16,6 +16,7 @@ namespace BlueSteelLadyBug
             _pos = 0;
             remainBytes = size;
         }
+        ~MemoryStream() override {}
         int read(lb_byte_t *target, int count = 1) override;
         bool seek(int value, SeekOrigin origin = BEGIN) override;
         bool canSeek() override { return true; };

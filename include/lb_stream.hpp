@@ -11,11 +11,12 @@ namespace BlueSteelLadyBug
         END = 2      // Specifies the end of a stream.
     };
 
-#define EOF -1;
+#define LB_EOF -1;
 
     class IInputStream
     {
     public:
+        virtual ~IInputStream(){};
         virtual int read(lb_byte_t *buf, int count = 1) = 0;
         virtual bool canSeek() = 0;
         virtual bool seek(int value, SeekOrigin origin = BEGIN) = 0;

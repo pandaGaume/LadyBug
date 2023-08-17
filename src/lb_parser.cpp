@@ -14,6 +14,7 @@ bool PBReader::_readPacked(T *v, WireType wt)
         {
             return false;
         }
+        _status.lengthReaded = false;
         size_t end = _status.position + size;
         bool r = true;
         if (_status.position < end)
@@ -28,7 +29,6 @@ bool PBReader::_readPacked(T *v, WireType wt)
                 v++;
             } while (_status.position < end);
         }
-        _status.lengthReaded = false;
         return r;
     }
     default:
@@ -54,8 +54,10 @@ bool PBReader::readLength(lb_uint64_t *v)
             {
                 return false;
             }
+            _status.length = *v;
             _status.lengthReaded = true;
         }
+        return true;
     }
     default:
     {
@@ -101,9 +103,9 @@ bool PBReader::_readVarint(lb_uint64_t *dest)
     }
 
     _status.position++;
-    if ((byte && 0x80))
+    if (byte & 0x80)
     {
-        lb_int64_t res = byte & 0x7F;
+        lb_uint64_t res = byte & 0x7F;
         lb_fastbyte_t shift = 7;
         do
         {
@@ -112,8 +114,8 @@ bool PBReader::_readVarint(lb_uint64_t *dest)
                 return false;
             }
             _status.position++;
-            res |= (byte & 0x07) << shift;
-            if ((byte && 0x80) == 0)
+            res |= (lb_uint64_t)(byte & 0x07) << shift;
+            if ((byte & 0x80) == 0)
             {
                 break;
             }
@@ -382,6 +384,7 @@ bool PBReader::readValue(char *v)
     {
         return false;
     }
+    _status.lengthReaded = false;
     lb_byte_t *t = (lb_byte_t *)v;
     if (_input->read(t, (int)size) != (int)size)
     {
@@ -389,7 +392,6 @@ bool PBReader::readValue(char *v)
     };
     t[size] = 0; // null terminated
     return true;
-    ;
 }
 
 bool PBReader::readValue(lb_byte_t *v)
@@ -399,6 +401,7 @@ bool PBReader::readValue(lb_byte_t *v)
     {
         return false;
     }
+    _status.lengthReaded = false;
     return _input->read(v, (int)size) == (int)size;
 }
 

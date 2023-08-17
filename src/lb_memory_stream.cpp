@@ -9,7 +9,7 @@ int MemoryStream::read(lb_byte_t *target, int count)
         size_t c = count;
         if (c == 1)
         {
-            *target = *_buffer + _pos;
+            *target = *(_buffer + _pos);
             _pos++;
             remainBytes--;
             return 1;
@@ -20,7 +20,7 @@ int MemoryStream::read(lb_byte_t *target, int count)
         remainBytes -= l;
         return l;
     }
-    return EOF;
+    return LB_EOF;
 }
 
 bool MemoryStream::seek(int value, SeekOrigin origin)

@@ -21,7 +21,7 @@ namespace BlueSteelLadyBug
         lb_uint32_t fieldNumber;
 
         lb_uint64_t length;
-        bool lengthReaded = false;
+        bool lengthReaded;
     };
 
     class PBReader
@@ -29,7 +29,11 @@ namespace BlueSteelLadyBug
     public:
         PBReader(IInputStream *input)
         {
-            lb_memset(&_status, 0, sizeof(ReaderStatus));
+            _status.position = 0;
+            _status.wireType = PB_VARINT;
+            _status.fieldNumber = 0;
+            _status.fieldNumber = 0;
+            _status.lengthReaded = false;
             _input = input;
         }
 
