@@ -16,6 +16,7 @@ namespace BlueSteelLadyBug
 
     struct ReaderStatus
     {
+        lb_uint16_t depth;
         size_t position;
         WireType wireType;
         lb_uint32_t fieldNumber;
@@ -27,22 +28,24 @@ namespace BlueSteelLadyBug
     class PBReader
     {
     public:
-        PBReader(IInputStream *input)
+        PBReader()
         {
             _status.position = 0;
             _status.wireType = PB_VARINT;
             _status.fieldNumber = 0;
             _status.fieldNumber = 0;
+            _status.depth = 0;
             _status.lengthReaded = false;
+        }
+
+        PBReader(IInputStream *input) : PBReader()
+        {
             _input = input;
         }
 
-        PBReader(PBReader &other)
+        ~PBReader()
         {
-            _status = other._status;
-            _input = other._input;
         }
-        ~PBReader() {}
 
         /// @brief reads the next protobuf tag from the input source.
         /// @return true if the token was read successfully; otherwise, false.
@@ -69,6 +72,8 @@ namespace BlueSteelLadyBug
         bool readPacked(lb_float_t *);
         bool readPacked(lb_double_t *);
 
+        PBReader *getSubReader();
+
         bool skip();
 
         /// @brief Save the current status of the parser. To do so, the underlying stream MUST support Seek operation.
@@ -80,10 +85,11 @@ namespace BlueSteelLadyBug
         lb_uint32_t getFieldNumber() { return _status.fieldNumber; }
         WireType getWireType() { return _status.wireType; }
         size_t getPosition() { return _status.position; }
+        lb_byte_t getDepth() { return _status.depth; }
         size_t getRemainBytes() { return _input->remainBytes; }
         IInputStream *getInput() { return _input; }
 
-    private:
+    protected:
         ReaderStatus _status;
         IInputStream *_input;
 
@@ -101,9 +107,24 @@ namespace BlueSteelLadyBug
 
         template <typename T>
         bool _readPacked(T *, WireType);
+
+        void _invalidateLengthReaded() { _status.lengthReaded = false; }
     };
 
     typedef PBReader *PBReaderPtr;
+
+    class PBSubReader : public PBReader
+    {
+    public:
+        PBSubReader(PBReader *r, lb_uint16_t depth, size_t from, size_t length) : _sv(r->getInput(), from, length)
+        {
+            _status.depth = depth;
+        }
+
+    private:
+        StreamView _sv;
+    };
+
 }
 
 #endif

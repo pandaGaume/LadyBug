@@ -14,7 +14,7 @@ bool PBReader::_readPacked(T *v, WireType wt)
         {
             return false;
         }
-        _status.lengthReaded = false;
+        _invalidateLengthReaded();
         size_t end = _status.position + size;
         bool r = true;
         if (_status.position < end)
@@ -91,6 +91,18 @@ void PBReader::restore()
     if (_input->canSeek())
     {
     }
+}
+
+PBReader *PBReader::getSubReader()
+{
+    lb_uint64_t l;
+    if (!readLength(&l))
+    {
+        return nullptr;
+    }
+    _invalidateLengthReaded();
+
+    return new PBSubReader(this, _status.depth + 1, _status.position, l);
 }
 
 bool PBReader::_readVarint(lb_uint64_t *dest)
@@ -384,7 +396,7 @@ bool PBReader::readValue(char *v)
     {
         return false;
     }
-    _status.lengthReaded = false;
+    _invalidateLengthReaded();
     lb_byte_t *t = (lb_byte_t *)v;
     if (_input->read(t, (int)size) != (int)size)
     {
@@ -401,7 +413,7 @@ bool PBReader::readValue(lb_byte_t *v)
     {
         return false;
     }
-    _status.lengthReaded = false;
+    _invalidateLengthReaded();
     return _input->read(v, (int)size) == (int)size;
 }
 
@@ -416,7 +428,7 @@ bool PBReader::skip()
         {
             return false;
         }
-        _status.lengthReaded = false;
+        _invalidateLengthReaded();
         return _input->seek((int)size, CURRENT);
     }
     case PB_VARINT:

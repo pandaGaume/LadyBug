@@ -16,6 +16,7 @@ extern "C"
     typedef int lb_sint32_t;
     typedef long long lb_int64_t;
     typedef unsigned int lb_uint32_t;
+    typedef unsigned short lb_uint16_t;
     typedef unsigned long long lb_uint64_t;
 
     typedef float lb_float_t;
