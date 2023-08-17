@@ -16,11 +16,12 @@ namespace BlueSteelLadyBug
 
     struct ReaderStatus
     {
-        lb_byte_t currentDepth;
         size_t position;
         WireType wireType;
-        WireType packedWireType;
         lb_uint32_t fieldNumber;
+
+        lb_uint64_t length;
+        bool lengthReaded = false;
     };
 
     class PBReader
@@ -42,6 +43,8 @@ namespace BlueSteelLadyBug
         /// @brief reads the next protobuf tag from the input source.
         /// @return true if the token was read successfully; otherwise, false.
         bool readTag();
+
+        bool readLength(lb_uint64_t *);
 
         bool readValue(lb_int32_t *);
         bool readValue(lb_int64_t *);
@@ -70,15 +73,16 @@ namespace BlueSteelLadyBug
         /// @brief Restore the status previously saved. To do so, the underlying stream MUST support Seek operation
         void restore();
 
+        lb_uint32_t getFieldNumber() { return _status.fieldNumber; }
+        WireType getWireType() { return _status.wireType; }
+        size_t getPosition() { return _status.position; }
+        size_t getRemainBytes() { return _input->remainBytes; }
+        IInputStream *getInput() { return _input; }
+
     private:
         ReaderStatus _status;
         IInputStream *_input;
 
-        /// @brief Read raw uint data of varint format. Do not include sign process such ZigZag or Google's signed varint
-        /// we use 64 bit as target because it's the largest type it can be saved in protobuf with the VARINT wire type.
-        // possible types are : int32, int64, uint32, uint64, sint32, sint64, bool, enum
-        /// @param dest
-        /// @return
         bool _readVarint(lb_uint64_t *dest);
         bool _readSVarint(lb_int64_t *dest);
         bool _readFixed32(void *dest);
