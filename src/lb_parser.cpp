@@ -2,6 +2,45 @@
 
 using namespace BlueSteelLadyBug;
 
+template <typename T>
+bool PBReader::_readPacked(T *v, WireType wt)
+{
+    switch (_status.wireType)
+    {
+    case PB_LEN:
+    {
+        if (wt != PB_VARINT && wt != PB_64BIT)
+        {
+            return false;
+        }
+
+        lb_uint64_t size;
+        if (!_readVarint(&size))
+        {
+            return false;
+        }
+        size_t end = _status.position + size;
+        if (_status.position < end)
+        {
+            do
+            {
+                if (!_readValue(v, wt))
+                {
+                    return false;
+                }
+                v++;
+            } while (_status.position < end);
+        }
+        return true;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return false;
+}
+
 bool PBReader::readTag()
 {
     // read a tag.
@@ -137,9 +176,9 @@ bool PBReader::_readFixed64(void *dest)
     return r;
 }
 
-bool PBReader::readValue(lb_int32_t *v)
+bool PBReader::_readValue(lb_int32_t *v, WireType wt)
 {
-    switch (_status.wireType)
+    switch (wt)
     {
     case PB_VARINT:
     {
@@ -162,9 +201,9 @@ bool PBReader::readValue(lb_int32_t *v)
     }
 }
 
-inline bool PBReader::readValue(lb_int64_t *v)
+inline bool PBReader::_readValue(lb_int64_t *v, WireType wt)
 {
-    switch (_status.wireType)
+    switch (wt)
     {
     case PB_VARINT:
     {
@@ -182,9 +221,9 @@ inline bool PBReader::readValue(lb_int64_t *v)
     return false;
 }
 
-bool PBReader::readValue(lb_uint32_t *v)
+bool PBReader::_readValue(lb_uint32_t *v, WireType wt)
 {
-    switch (_status.wireType)
+    switch (wt)
     {
     case PB_VARINT:
     {
@@ -209,9 +248,9 @@ bool PBReader::readValue(lb_uint32_t *v)
     return false;
 }
 
-bool PBReader::readValue(lb_uint64_t *v)
+bool PBReader::_readValue(lb_uint64_t *v, WireType wt)
 {
-    switch (_status.wireType)
+    switch (wt)
     {
     case PB_VARINT:
     {
@@ -228,27 +267,78 @@ bool PBReader::readValue(lb_uint64_t *v)
     }
 }
 
-bool PBReader::readValue(lb_float_t *v)
+bool PBReader::_readValue(lb_float_t *v, WireType wt)
 {
-    lb_uint32_t value;
-    if (!_readFixed32(&value))
+    switch (wt)
+    {
+    case (PB_32BIT):
+    {
+        lb_uint32_t value;
+        if (!_readFixed32(&value))
+        {
+            return false;
+        }
+        *v = (lb_float_t)value;
+        return true;
+    }
+
+    default:
     {
         return false;
     }
-    *v = (lb_float_t)value;
-    return true;
+    }
 }
 
-bool PBReader::readValue(lb_double_t *v)
+bool PBReader::_readValue(lb_double_t *v, WireType wt)
 {
-    lb_uint64_t value;
-    if (!_readFixed64(&value))
+    switch (wt)
+    {
+    case (PB_64BIT):
+    {
+        lb_uint64_t value;
+        if (!_readFixed64(&value))
+        {
+            return false;
+        }
+        *v = (lb_double_t)value;
+        return true;
+    }
+
+    default:
     {
         return false;
     }
-    *v = (lb_double_t)value;
+    }
+}
 
-    return true;
+inline bool PBReader::readValue(lb_int32_t *v)
+{
+    return _readValue(v, _status.wireType);
+}
+
+inline bool PBReader::readValue(lb_int64_t *v)
+{
+    return _readValue(v, _status.wireType);
+}
+
+inline bool PBReader::readValue(lb_uint32_t *v)
+{
+    return _readValue(v, _status.wireType);
+}
+
+inline bool PBReader::readValue(lb_uint64_t *v)
+{
+    return _readValue(v, _status.wireType);
+}
+
+inline bool PBReader::readValue(lb_float_t *v)
+{
+    return _readValue(v, _status.wireType);
+}
+
+inline bool PBReader::readValue(lb_double_t *v)
+{
+    return _readValue(v, _status.wireType);
 }
 
 bool PBReader::readValue(lb_bool_t *v)
@@ -348,283 +438,32 @@ bool PBReader::readValue_s(lb_byte_t *v, int s)
     return true;
 }
 
-bool PBReader::readPacked(lb_int32_t *v, WireType wt)
+inline bool PBReader::readPacked(lb_int32_t *v, WireType wt)
 {
-    switch (_status.wireType)
-    {
-    case PB_LEN:
-    {
-        lb_uint64_t size;
-        if (!_readVarint(&size))
-        {
-            return false;
-        }
-        size_t end = _status.position + size;
-        if (_status.position < end)
-        {
-            lb_int64_t value;
-            do
-            {
-                switch (wt)
-                {
-                case PB_VARINT:
-                {
-                    if (!_readSVarint(&value))
-                    {
-                        return false;
-                    }
-                    *v = (lb_int32_t)value;
-                }
-                case PB_32BIT:
-                {
-                    if (!_readFixed32(v))
-                    {
-                        return false;
-                    }
-                }
-                default:
-                {
-                    return false;
-                }
-                }
-                v++;
-            } while (_status.position < end);
-        }
-        return true;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return false;
+    return _readPacked<lb_int32_t>(v, wt);
 }
 
-bool PBReader::readPacked(lb_int64_t *v, WireType wt)
+inline bool PBReader::readPacked(lb_int64_t *v, WireType wt)
 {
-    switch (_status.wireType)
-    {
-    case PB_LEN:
-    {
-        lb_uint64_t size;
-        if (!_readVarint(&size))
-        {
-            return false;
-        }
-        size_t end = _status.position + size;
-        if (_status.position < end)
-        {
-            do
-            {
-                switch (wt)
-                {
-                case PB_VARINT:
-                {
-                    if (!_readSVarint(v))
-                    {
-                        return false;
-                    }
-                }
-                case PB_64BIT:
-                {
-                    if (!_readFixed64(v))
-                    {
-                        return false;
-                    }
-                }
-                default:
-                {
-                    return false;
-                }
-                }
-                v++;
-            } while (_status.position < end);
-        }
-        return true;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return false;
+    return _readPacked<lb_int64_t>(v, wt);
 }
 
-bool PBReader::readPacked(lb_uint32_t *v, WireType wt)
+inline bool PBReader::readPacked(lb_uint32_t *v, WireType wt)
 {
-    switch (_status.wireType)
-    {
-    case PB_LEN:
-    {
-
-        lb_uint64_t size;
-        if (!_readVarint(&size))
-        {
-            return false;
-        }
-
-        size_t end = _status.position + size;
-        if (_status.position < end)
-        {
-            lb_uint64_t value;
-            do
-            {
-                switch (wt)
-                {
-                case PB_VARINT:
-                {
-                    if (!_readVarint(&value))
-                    {
-                        return false;
-                    }
-                    *v = (lb_uint32_t)value;
-                }
-                case PB_32BIT:
-                {
-                    if (!_readFixed32(v))
-                    {
-                        return false;
-                    }
-                }
-                default:
-                {
-                    return false;
-                }
-                }
-                v++;
-            } while (_status.position < end);
-        }
-        return true;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return false;
+    return _readPacked<lb_uint32_t>(v, wt);
 }
 
-bool PBReader::readPacked(lb_uint64_t *v, WireType wt)
+inline bool PBReader::readPacked(lb_uint64_t *v, WireType wt)
 {
-    switch (_status.wireType)
-    {
-    case PB_LEN:
-    {
-        if (wt != PB_VARINT && wt != PB_64BIT)
-        {
-            return false;
-        }
-
-        lb_uint64_t size;
-        if (!_readVarint(&size))
-        {
-            return false;
-        }
-        size_t end = _status.position + size;
-        if (_status.position < end)
-        {
-            do
-            {
-                switch (wt)
-                {
-                case PB_VARINT:
-                {
-                    if (!_readVarint(v))
-                    {
-                        return false;
-                    }
-                }
-                case PB_64BIT:
-                {
-                    if (!_readFixed64(v))
-                    {
-                        return false;
-                    }
-                }
-                default:
-                {
-                    return false;
-                }
-                }
-                v++;
-            } while (_status.position < end);
-        }
-        return true;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return false;
+    return _readPacked<lb_uint64_t>(v, wt);
 }
 
-bool PBReader::readPacked(lb_float_t *v)
+inline bool PBReader::readPacked(lb_float_t *v)
 {
-    switch (_status.wireType)
-    {
-    case PB_LEN:
-    {
-        lb_uint64_t size;
-        if (!_readVarint(&size))
-        {
-            return false;
-        }
-        size_t end = _status.position + size;
-        if (_status.position < end)
-        {
-            lb_uint32_t value;
-            do
-            {
-                if (!_readFixed32(&value))
-                {
-                    return false;
-                }
-                *v = (lb_float_t)value;
-                v++;
-            } while (_status.position < end);
-        }
-        return true;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return false;
+    return _readPacked<lb_float_t>(v, PB_32BIT);
 }
 
-bool PBReader::readPacked(lb_double_t *v)
+inline bool PBReader::readPacked(lb_double_t *v)
 {
-    switch (_status.wireType)
-    {
-    case PB_LEN:
-    {
-        lb_uint64_t size;
-        if (!_readVarint(&size))
-        {
-            return false;
-        }
-        size_t end = _status.position + size;
-        if (_status.position < end)
-        {
-            lb_uint64_t value;
-            do
-            {
-                if (!_readFixed64(&value))
-                {
-                    return false;
-                }
-                *v = (lb_float_t)value;
-                v++;
-            } while (_status.position < end);
-        }
-        return true;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return false;
+    return _readPacked<lb_double_t>(v, PB_64BIT);
 }

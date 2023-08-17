@@ -83,6 +83,16 @@ namespace BlueSteelLadyBug
         bool _readSVarint(lb_int64_t *dest);
         bool _readFixed32(void *dest);
         bool _readFixed64(void *dest);
+
+        bool _readValue(lb_int32_t *, WireType);
+        bool _readValue(lb_int64_t *, WireType);
+        bool _readValue(lb_uint32_t *, WireType);
+        bool _readValue(lb_uint64_t *, WireType);
+        bool _readValue(lb_float_t *, WireType);
+        bool _readValue(lb_double_t *, WireType);
+
+        template <typename T>
+        bool _readPacked(T *, WireType);
     };
 
     typedef PBReader *PBReaderPtr;
