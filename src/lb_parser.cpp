@@ -416,6 +416,7 @@ bool PBReader::skip()
         {
             return false;
         }
+        _status.lengthReaded = false;
         return _input->seek((int)size, CURRENT);
     }
     case PB_VARINT:
