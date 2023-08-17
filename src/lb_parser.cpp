@@ -9,36 +9,59 @@ bool PBReader::_readPacked(T *v, WireType wt)
     {
     case PB_LEN:
     {
-        if (wt != PB_VARINT && wt != PB_64BIT)
-        {
-            return false;
-        }
-
         lb_uint64_t size;
-        if (!_readVarint(&size))
+        if (!readLength(&size))
         {
             return false;
         }
         size_t end = _status.position + size;
+        bool r = true;
         if (_status.position < end)
         {
             do
             {
                 if (!_readValue(v, wt))
                 {
-                    return false;
+                    r = false;
+                    break;
                 }
                 v++;
             } while (_status.position < end);
         }
-        return true;
+        _status.lengthReaded = false;
+        return r;
     }
     default:
     {
-        break;
+        return false;
     }
     }
-    return false;
+}
+
+bool PBReader::readLength(lb_uint64_t *v)
+{
+    switch (_status.wireType)
+    {
+    case PB_LEN:
+    {
+        if (_status.lengthReaded)
+        {
+            *v = _status.length;
+        }
+        else
+        {
+            if (!_readVarint(v))
+            {
+                return false;
+            }
+            _status.lengthReaded = true;
+        }
+    }
+    default:
+    {
+        return false;
+    }
+    }
 }
 
 bool PBReader::readTag()
@@ -355,19 +378,28 @@ bool PBReader::readValue(lb_bool_t *v)
 bool PBReader::readValue(char *v)
 {
     lb_uint64_t size;
-    lb_byte_t *t = (lb_byte_t *)v;
-    bool r = (_readVarint(&size) && _input->read(t, (int)size) == (int)size);
-    if (r)
+    if (!readLength(&size))
     {
-        t[size] = 0; // null terminated
+        return false;
+    }
+    lb_byte_t *t = (lb_byte_t *)v;
+    if (_input->read(t, (int)size) != (int)size)
+    {
+        return false;
     };
-    return r;
+    t[size] = 0; // null terminated
+    return true;
+    ;
 }
 
 bool PBReader::readValue(lb_byte_t *v)
 {
     lb_uint64_t size;
-    return (_readVarint(&size) && _input->read(v, (int)size) == (int)size);
+    if (!readLength(&size))
+    {
+        return false;
+    }
+    return _input->read(v, (int)size) == (int)size;
 }
 
 bool PBReader::skip()
@@ -377,7 +409,11 @@ bool PBReader::skip()
     case PB_LEN:
     {
         lb_uint64_t size;
-        return (_readVarint(&size) && _input->seek((int)size, CURRENT));
+        if (!readLength(&size))
+        {
+            return false;
+        }
+        return _input->seek((int)size, CURRENT);
     }
     case PB_VARINT:
     {
@@ -398,7 +434,7 @@ bool PBReader::skip()
 bool PBReader::readValue_s(char *v, int s)
 {
     lb_uint64_t size;
-    if (!_readVarint(&size))
+    if (!readLength(&size))
     {
         return false;
     }
@@ -419,7 +455,7 @@ bool PBReader::readValue_s(char *v, int s)
 bool PBReader::readValue_s(lb_byte_t *v, int s)
 {
     lb_uint64_t size;
-    if (!_readVarint(&size))
+    if (!readLength(&size))
     {
         return false;
     }
