@@ -16,10 +16,9 @@ namespace BlueSteelLadyBug
 
     struct ReaderStatus
     {
-        lb_uint16_t depth;
-        WireType wireType;
         lb_uint32_t fieldNumber;
-
+        WireType wireType;
+        lb_uint16_t depth;
         lb_uint64_t length;
         bool lengthReaded;
     };
@@ -111,8 +110,6 @@ namespace BlueSteelLadyBug
         void _invalidateLengthReaded() { _status.lengthReaded = false; }
     };
 
-    typedef PBReader *PBReaderPtr;
-
     class PBSubReader : public PBReader
     {
     public:
@@ -120,12 +117,13 @@ namespace BlueSteelLadyBug
         {
             _status.depth = depth;
             _input = &(this->_sv);
+            _parent = r;
         }
 
     private:
+        PBReader *_parent;
         StreamView _sv;
     };
-
 }
 
 #endif

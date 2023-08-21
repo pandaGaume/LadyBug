@@ -25,6 +25,20 @@ char *ReadFileIntoMemory(const char *filename, size_t *fileSize)
     return buffer;
 }
 
+void readString(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
+{
+    char spaces[32];
+    memset((void *)spaces, ' ', reader->getDepth() + 2);
+    spaces[reader->getDepth() + 2] = '\0';
+
+    size_t l;
+    reader->readLength(&l);
+    char *name = (char *)malloc(l + 1);
+    reader->readValue(name);
+    std::cout << spaces << fieldName << ":" << name << "\r\n";
+    free(name);
+}
+
 void readNode(BlueSteelLadyBug ::PBReader *reader)
 {
     char spaces[32];
@@ -152,6 +166,11 @@ void readModel(BlueSteelLadyBug ::PBReader *reader)
             std::cout << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
+            case 2:
+            {
+                readString(reader, "Name");
+                break;
+            }
             case 7:
             {
                 BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();

@@ -14,7 +14,7 @@ int MemoryStream::read(lb_byte_t *target, int count)
             return 1;
         }
         size_t l = min(c, _size - _pos);
-        memcpy(target, _buffer, l);
+        memcpy(target, _buffer + _pos, l);
         _pos += l;
         return l;
     }
