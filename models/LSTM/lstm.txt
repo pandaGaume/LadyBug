@@ -1,0 +1,711 @@
+ir_version: 3
+producer_name: "CNTK"
+producer_version: "2.5.1"
+domain: "ai.cntk"
+model_version: 1
+graph {
+  node {
+    input: "Input3"
+    input: "Parameter5"
+    input: "Parameter6"
+    input: "Parameter4"
+    input: ""
+    input: "Block1237_Output_0_initial_h"
+    input: "Block1237_Output_1_initial_c"
+    input: ""
+    output: "Block1237_Output_0_before_reshape"
+    name: "Block1237"
+    op_type: "LSTM"
+    attribute {
+      name: "direction"
+      s: "reverse"
+      type: STRING
+    }
+    attribute {
+      name: "activations"
+      strings: "Sigmoid"
+      strings: "Tanh"
+      strings: "Tanh"
+      type: STRINGS
+    }
+    attribute {
+      name: "hidden_size"
+      i: 3
+      type: INT
+    }
+    attribute {
+      name: "input_forget"
+      i: 0
+      type: INT
+    }
+    doc_string: ""
+    domain: ""
+  }
+  node {
+    input: "Block1237_Output_0_before_reshape"
+    input: "Block1237_Output_0_shape"
+    output: "Block1237_Output_0"
+    name: "Combine1218_reshape"
+    op_type: "Reshape"
+    doc_string: ""
+    domain: ""
+  }
+  node {
+    input: "Input3"
+    input: "Parameter454"
+    input: "Parameter455"
+    input: "Parameter453"
+    input: ""
+    input: "Block1326_Output_0_initial_h"
+    input: "Block1326_Output_1_initial_c"
+    input: ""
+    output: "Block1326_Output_0_before_reshape"
+    name: "Block1326"
+    op_type: "LSTM"
+    attribute {
+      name: "direction"
+      s: "forward"
+      type: STRING
+    }
+    attribute {
+      name: "activations"
+      strings: "Sigmoid"
+      strings: "Tanh"
+      strings: "Tanh"
+      type: STRINGS
+    }
+    attribute {
+      name: "hidden_size"
+      i: 3
+      type: INT
+    }
+    attribute {
+      name: "input_forget"
+      i: 0
+      type: INT
+    }
+    doc_string: ""
+    domain: ""
+  }
+  node {
+    input: "Block1326_Output_0_before_reshape"
+    input: "Block1326_Output_0_shape"
+    output: "Block1326_Output_0"
+    name: "Combine1307_reshape"
+    op_type: "Reshape"
+    doc_string: ""
+    domain: ""
+  }
+  node {
+    input: "Block1237_Output_0"
+    input: "Block1326_Output_0"
+    output: "Splice1349_Output_0"
+    name: "Splice1349"
+    op_type: "Concat"
+    attribute {
+      name: "axis"
+      i: 2
+      type: INT
+    }
+    doc_string: ""
+    domain: ""
+  }
+  name: "CNTKGraph"
+  initializer {
+    dims: 1
+    dims: 12
+    dims: 2
+    data_type: 1
+    float_data: -0.445435047
+    float_data: 0.563566625
+    float_data: 0.644369304
+    float_data: -0.203747123
+    float_data: -0.602845669
+    float_data: -0.321284294
+    float_data: 0.531973422
+    float_data: 0.103781007
+    float_data: -0.100622669
+    float_data: 0.0845153
+    float_data: 0.203631133
+    float_data: -0.462947339
+    float_data: 0.172211066
+    float_data: 0.0755215436
+    float_data: -0.100069664
+    float_data: -0.278318882
+    float_data: 0.4481242
+    float_data: -0.463735908
+    float_data: 0.127650484
+    float_data: -0.0724427849
+    float_data: 0.0553640202
+    float_data: 0.379947096
+    float_data: -0.579813957
+    float_data: 0.255865365
+    name: "Parameter5"
+  }
+  initializer {
+    dims: 1
+    dims: 12
+    dims: 3
+    data_type: 1
+    float_data: -0.463113487
+    float_data: 0.36638397
+    float_data: -0.225458875
+    float_data: -0.459912747
+    float_data: -0.352108657
+    float_data: -0.48930037
+    float_data: -0.0617088079
+    float_data: -0.102877073
+    float_data: -0.481484354
+    float_data: 0.171055466
+    float_data: 0.314951181
+    float_data: -0.128552258
+    float_data: -0.51930517
+    float_data: -0.0529687181
+    float_data: -0.391670704
+    float_data: 0.0710613132
+    float_data: -0.245156616
+    float_data: 0.122684672
+    float_data: -0.0369959511
+    float_data: -0.0321365744
+    float_data: 0.367084175
+    float_data: -0.538314462
+    float_data: -0.291006058
+    float_data: -0.135947675
+    float_data: 0.0883504301
+    float_data: -0.270638078
+    float_data: 0.0378680341
+    float_data: -0.605861723
+    float_data: -0.316508681
+    float_data: -0.545026183
+    float_data: -0.18860063
+    float_data: -0.263272703
+    float_data: 0.246355236
+    float_data: 0.520331323
+    float_data: 0.383566976
+    float_data: 0.186949715
+    name: "Parameter6"
+  }
+  initializer {
+    dims: 1
+    dims: 24
+    data_type: 1
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    name: "Parameter4"
+  }
+  initializer {
+    dims: 1
+    dims: 1
+    dims: 3
+    data_type: 1
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    name: "Block1237_Output_0_initial_h"
+  }
+  initializer {
+    dims: 1
+    dims: 1
+    dims: 3
+    data_type: 1
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    name: "Block1237_Output_1_initial_c"
+  }
+  initializer {
+    dims: 3
+    data_type: 7
+    int64_data: 0
+    int64_data: 1
+    int64_data: 3
+    name: "Block1237_Output_0_shape"
+  }
+  initializer {
+    dims: 1
+    dims: 12
+    dims: 2
+    data_type: 1
+    float_data: 0.528441727
+    float_data: 0.397154033
+    float_data: 0.458566755
+    float_data: -0.480806023
+    float_data: 0.371608227
+    float_data: -0.391779929
+    float_data: 0.243325427
+    float_data: -0.562185407
+    float_data: 0.201744586
+    float_data: -0.0464899056
+    float_data: 0.613273263
+    float_data: -0.0824335814
+    float_data: -0.36066094
+    float_data: -0.187908441
+    float_data: -0.52418077
+    float_data: -0.152175009
+    float_data: -0.625734031
+    float_data: -0.579637051
+    float_data: 0.556870818
+    float_data: -0.566112578
+    float_data: -0.323525041
+    float_data: 0.652401447
+    float_data: -0.47673735
+    float_data: 0.0863778219
+    name: "Parameter454"
+  }
+  initializer {
+    dims: 1
+    dims: 12
+    dims: 3
+    data_type: 1
+    float_data: 0.0743337497
+    float_data: 0.0861666277
+    float_data: 0.397687912
+    float_data: -0.384831786
+    float_data: 0.522501528
+    float_data: -0.309777945
+    float_data: 0.114147179
+    float_data: -0.302221745
+    float_data: -0.191463903
+    float_data: -0.422308743
+    float_data: -0.361185879
+    float_data: -0.0581178
+    float_data: -0.490051806
+    float_data: -0.592313886
+    float_data: 0.17675063
+    float_data: 0.115481593
+    float_data: -0.534301341
+    float_data: 0.492110223
+    float_data: 0.300092667
+    float_data: 0.605096817
+    float_data: -0.59424454
+    float_data: -0.097831741
+    float_data: -0.00814679917
+    float_data: 0.168055341
+    float_data: 0.258958876
+    float_data: -0.150973827
+    float_data: -0.316683501
+    float_data: -0.194329664
+    float_data: -0.606605053
+    float_data: -0.171718284
+    float_data: 0.0756361634
+    float_data: -0.272506177
+    float_data: 0.192616537
+    float_data: -0.17543976
+    float_data: 0.369980305
+    float_data: 0.0561372638
+    name: "Parameter455"
+  }
+  initializer {
+    dims: 1
+    dims: 24
+    data_type: 1
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    name: "Parameter453"
+  }
+  initializer {
+    dims: 1
+    dims: 1
+    dims: 3
+    data_type: 1
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    name: "Block1326_Output_0_initial_h"
+  }
+  initializer {
+    dims: 1
+    dims: 1
+    dims: 3
+    data_type: 1
+    float_data: 0
+    float_data: 0
+    float_data: 0
+    name: "Block1326_Output_1_initial_c"
+  }
+  initializer {
+    dims: 3
+    data_type: 7
+    int64_data: 0
+    int64_data: 1
+    int64_data: 3
+    name: "Block1326_Output_0_shape"
+  }
+  input {
+    name: "Input3"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_param: "None"
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 2
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Parameter5"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 12
+          }
+          dim {
+            dim_value: 2
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Parameter6"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 12
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Parameter4"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 24
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Block1237_Output_0_initial_h"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Block1237_Output_1_initial_c"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Block1237_Output_0_shape"
+    type {
+      tensor_type {
+        elem_type: 7
+        shape {
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Parameter454"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 12
+          }
+          dim {
+            dim_value: 2
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Parameter455"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 12
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Parameter453"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 24
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Block1326_Output_0_initial_h"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Block1326_Output_1_initial_c"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: "Block1326_Output_0_shape"
+    type {
+      tensor_type {
+        elem_type: 7
+        shape {
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  output {
+    name: "Splice1349_Output_0"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 6
+          }
+        }
+      }
+    }
+  }
+  value_info {
+    name: "Block1237_Output_0_before_reshape"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_param: "None"
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  value_info {
+    name: "Block1326_Output_0_before_reshape"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_param: "None"
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  value_info {
+    name: "Block1237_Output_0"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_param: "None"
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+  value_info {
+    name: "Block1326_Output_0"
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+            dim_param: "None"
+          }
+          dim {
+            dim_value: 1
+          }
+          dim {
+            dim_value: 3
+          }
+        }
+      }
+    }
+  }
+}
+opset_import {
+  domain: ""
+  version: 7
+}

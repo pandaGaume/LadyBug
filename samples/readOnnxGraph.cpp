@@ -5,6 +5,8 @@
 #include "lb_parser.hpp"
 #include "lb_memory_stream.hpp"
 
+#define MAX_DEPTH 32
+
 char *ReadFileIntoMemory(const char *filename, size_t *fileSize)
 {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -43,8 +45,7 @@ char *ReadFileIntoMemory(const char *filename, size_t *fileSize)
 
 void readString(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
 {
-
-    GETSPACE(8)
+    GETSPACE(MAX_DEPTH)
     size_t l;
     reader->readLength(&l);
     char *name = (char *)malloc(l + 1);
@@ -56,7 +57,7 @@ void readString(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
 template <typename T>
 void readNumber(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
 {
-    GETSPACE(8)
+    GETSPACE(MAX_DEPTH)
     T v;
     reader->readValue(&v);
     std::cout << spaces << "\"" << fieldName << "\":" << v << "," << NEWLINE;
@@ -64,7 +65,7 @@ void readNumber(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
 
 void readNode(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -103,8 +104,7 @@ void readNode(BlueSteelLadyBug ::PBReader *reader)
 
 void readDimension(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -133,8 +133,7 @@ void readDimension(BlueSteelLadyBug ::PBReader *reader)
 
 void readShape(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -158,8 +157,7 @@ void readShape(BlueSteelLadyBug ::PBReader *reader)
 
 void readTensorType(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -188,8 +186,7 @@ void readTensorType(BlueSteelLadyBug ::PBReader *reader)
 
 void readType(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -213,8 +210,7 @@ void readType(BlueSteelLadyBug ::PBReader *reader)
 
 void readValueInfo(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -243,8 +239,7 @@ void readValueInfo(BlueSteelLadyBug ::PBReader *reader)
 
 void readGraph(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     if (reader->readTag())
     {
         do
@@ -273,7 +268,6 @@ void readGraph(BlueSteelLadyBug ::PBReader *reader)
             }
             default:
             {
-                std::cout << spaces << " field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
                 reader->skip();
                 break;
             }
@@ -284,8 +278,7 @@ void readGraph(BlueSteelLadyBug ::PBReader *reader)
 
 void readModel(BlueSteelLadyBug ::PBReader *reader)
 {
-    GETSPACE(8)
-
+    GETSPACE(MAX_DEPTH)
     std::cout << "{" << NEWLINE;
     if (reader->readTag())
     {
@@ -325,7 +318,6 @@ void readModel(BlueSteelLadyBug ::PBReader *reader)
             }
             default:
             {
-                std::cout << "field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
                 reader->skip();
                 break;
             }
@@ -336,7 +328,7 @@ void readModel(BlueSteelLadyBug ::PBReader *reader)
 };
 int main()
 {
-    const char *filename = "C:/Users/guill/Documents/sources/LadyBug/models/Abs/abs.onnx";
+    const char *filename = "C:/Users/guill/Documents/sources/LadyBug/models/LSTM/lstm.onnx";
     size_t fileSize;
     char *fileContents = ReadFileIntoMemory(filename, &fileSize);
 

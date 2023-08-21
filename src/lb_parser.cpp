@@ -118,20 +118,16 @@ bool PBReader::_readVarint(lb_uint64_t *dest)
     if (byte & 0x80)
     {
         lb_uint64_t res = byte & 0x7F;
-        lb_fastbyte_t shift = 7;
+        lb_fastbyte_t shift = 0;
         do
         {
+            shift += 7;
             if (_input->read(&byte) < 0)
             {
                 return false;
             }
-            res |= (lb_uint64_t)(byte & 0x07) << shift;
-            if ((byte & 0x80) == 0)
-            {
-                break;
-            }
-            shift += 7;
-        } while (true);
+            res |= (lb_uint64_t)(byte & 0x7F) << shift;
+        } while (byte & 0x80);
 
         if (dest)
         {
@@ -367,7 +363,8 @@ bool PBReader::readValue(char *v)
     }
     _invalidateLengthReaded();
     lb_byte_t *t = (lb_byte_t *)v;
-    if (_input->read(t, (int)size) != (int)size)
+    int readed = _input->read(t, (int)size);
+    if (readed != (int)size)
     {
         return false;
     };
