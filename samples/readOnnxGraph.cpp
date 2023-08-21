@@ -63,6 +63,40 @@ void readNumber(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
     std::cout << spaces << "\"" << fieldName << "\":" << v << "," << NEWLINE;
 }
 
+void readAttribute(BlueSteelLadyBug ::PBReader *reader)
+{
+    GETSPACE(MAX_DEPTH)
+    if (reader->readTag())
+    {
+        do
+        {
+            switch (reader->getFieldNumber())
+            {
+            case (1):
+            {
+                readString(reader, "name");
+                break;
+            }
+            case (2):
+            {
+                readNumber<lb_float_t>(reader, "f");
+                break;
+            }
+            case (3):
+            {
+                readNumber<lb_int64_t>(reader, "i");
+                break;
+            }
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            }
+        } while (reader->readTag());
+    }
+};
+
 void readNode(BlueSteelLadyBug ::PBReader *reader)
 {
     GETSPACE(MAX_DEPTH)
@@ -90,6 +124,11 @@ void readNode(BlueSteelLadyBug ::PBReader *reader)
             case (4):
             {
                 readString(reader, "op_type");
+                break;
+            }
+            case (5):
+            {
+                READ_SUB_MESSAGE(attribute, readAttribute);
                 break;
             }
             default:
