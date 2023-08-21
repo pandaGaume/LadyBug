@@ -51,12 +51,12 @@ namespace BlueSteelLadyBug
 
         bool readLength(lb_uint64_t *);
 
-        bool readValue(lb_int32_t *);
-        bool readValue(lb_int64_t *);
-        bool readValue(lb_uint32_t *);
-        bool readValue(lb_uint64_t *);
-        bool readValue(lb_float_t *);
-        bool readValue(lb_double_t *);
+        bool readValue(lb_int32_t *v) { return _readValue(v, _status.wireType); }
+        bool readValue(lb_int64_t *v) { return _readValue(v, _status.wireType); }
+        bool readValue(lb_uint32_t *v) { return _readValue(v, _status.wireType); }
+        bool readValue(lb_uint64_t *v) { return _readValue(v, _status.wireType); }
+        bool readValue(lb_float_t *v) { return _readValue(v, _status.wireType); }
+        bool readValue(lb_double_t *v) { return _readValue(v, _status.wireType); }
         bool readValue(lb_bool_t *);
         bool readValue(char *);
         bool readValue(lb_byte_t *);

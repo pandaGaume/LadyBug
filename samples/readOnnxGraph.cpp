@@ -25,34 +25,72 @@ char *ReadFileIntoMemory(const char *filename, size_t *fileSize)
     return buffer;
 }
 
+#define GETSPACE(s)                                      \
+    char spaces[s];                                      \
+    memset((void *)spaces, ' ', reader->getDepth() + 1); \
+    spaces[reader->getDepth() + 1] = '\0';
+
+#define NEWLINE "\r\n"
+
+#define JSON_NAME(s) "\"" #s "\""
+
+#define READ_SUB_MESSAGE(n, fn)                                             \
+    std::cout << spaces << JSON_NAME(n) << ":{" << NEWLINE;                 \
+    BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader(); \
+    fn(subReader);                                                          \
+    delete subReader;                                                       \
+    std::cout << spaces << "}," << NEWLINE;
+
 void readString(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
 {
-    char spaces[32];
-    memset((void *)spaces, ' ', reader->getDepth() + 2);
-    spaces[reader->getDepth() + 2] = '\0';
 
+    GETSPACE(8)
     size_t l;
     reader->readLength(&l);
     char *name = (char *)malloc(l + 1);
     reader->readValue(name);
-    std::cout << spaces << fieldName << ":" << name << "\r\n";
+    std::cout << spaces << "\"" << fieldName << "\":\"" << name << "\"," << NEWLINE;
     free(name);
+}
+
+template <typename T>
+void readNumber(BlueSteelLadyBug ::PBReader *reader, const char *fieldName)
+{
+    GETSPACE(8)
+    T v;
+    reader->readValue(&v);
+    std::cout << spaces << "\"" << fieldName << "\":" << v << "," << NEWLINE;
 }
 
 void readNode(BlueSteelLadyBug ::PBReader *reader)
 {
-    char spaces[32];
-    memset((void *)spaces, ' ', reader->getDepth());
-    spaces[reader->getDepth()] = '\0';
-
-    std::cout << spaces << "+ Read Node\r\n";
+    GETSPACE(8)
     if (reader->readTag())
     {
         do
         {
-            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
+            case (1):
+            {
+                readString(reader, "input");
+                break;
+            }
+            case (2):
+            {
+                readString(reader, "output");
+                break;
+            }
+            case (3):
+            {
+                readString(reader, "name");
+                break;
+            }
+            case (4):
+            {
+                readString(reader, "op_type");
+                break;
+            }
             default:
             {
                 reader->skip();
@@ -63,90 +101,179 @@ void readNode(BlueSteelLadyBug ::PBReader *reader)
     }
 };
 
-void readInput(BlueSteelLadyBug ::PBReader *reader)
+void readDimension(BlueSteelLadyBug ::PBReader *reader)
 {
-    char spaces[32];
-    memset((void *)spaces, ' ', reader->getDepth());
-    spaces[reader->getDepth()] = '\0';
+    GETSPACE(8)
 
-    std::cout << "+ Read Input infos\r\n";
     if (reader->readTag())
     {
         do
         {
-            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
+            case 1:
+            {
+                readNumber<lb_uint64_t>(reader, "dim_value");
+                break;
+            }
+            case 2:
+            {
+                readString(reader, "dim_param");
+                break;
+            }
             default:
             {
                 reader->skip();
                 break;
             }
-            }
+            };
         } while (reader->readTag());
     }
 };
 
-void readOutput(BlueSteelLadyBug ::PBReader *reader)
+void readShape(BlueSteelLadyBug ::PBReader *reader)
 {
-    char spaces[32];
-    memset((void *)spaces, ' ', reader->getDepth());
-    spaces[reader->getDepth()] = '\0';
+    GETSPACE(8)
 
-    std::cout << "+ Read Output Infos\r\n";
     if (reader->readTag())
     {
         do
         {
-            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
+            case 1:
+            {
+                READ_SUB_MESSAGE(dim, readDimension);
+                break;
+            }
             default:
             {
                 reader->skip();
                 break;
             }
+            };
+        } while (reader->readTag());
+    }
+};
+
+void readTensorType(BlueSteelLadyBug ::PBReader *reader)
+{
+    GETSPACE(8)
+
+    if (reader->readTag())
+    {
+        do
+        {
+            switch (reader->getFieldNumber())
+            {
+            case 1:
+            {
+                readNumber<lb_uint32_t>(reader, "elem_type");
+                break;
             }
+            case 2:
+            {
+                READ_SUB_MESSAGE(shape, readShape);
+                break;
+            }
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            };
+        } while (reader->readTag());
+    }
+};
+
+void readType(BlueSteelLadyBug ::PBReader *reader)
+{
+    GETSPACE(8)
+
+    if (reader->readTag())
+    {
+        do
+        {
+            switch (reader->getFieldNumber())
+            {
+            case 1:
+            {
+                READ_SUB_MESSAGE(tensor_type, readTensorType);
+                break;
+            }
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            };
+        } while (reader->readTag());
+    }
+};
+
+void readValueInfo(BlueSteelLadyBug ::PBReader *reader)
+{
+    GETSPACE(8)
+
+    if (reader->readTag())
+    {
+        do
+        {
+            switch (reader->getFieldNumber())
+            {
+            case 1:
+            {
+                readString(reader, "name");
+                break;
+            }
+            case 2:
+            {
+                READ_SUB_MESSAGE(type, readType);
+                break;
+            }
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            };
         } while (reader->readTag());
     }
 };
 
 void readGraph(BlueSteelLadyBug ::PBReader *reader)
 {
-    char spaces[32];
-    memset((void *)spaces, ' ', reader->getDepth());
-    spaces[reader->getDepth()] = '\0';
-    std::cout << spaces << "+ Read Graph\r\n";
+    GETSPACE(8)
+
     if (reader->readTag())
     {
         do
         {
-            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
             case 1:
             {
-                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
-                readNode(subReader);
-                delete subReader;
+                READ_SUB_MESSAGE(node, readNode);
+                break;
+            }
+            case 2:
+            {
+                readString(reader, "name");
                 break;
             }
             case 11:
             {
-                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
-                readInput(subReader);
-                delete subReader;
+                READ_SUB_MESSAGE(input, readValueInfo);
                 break;
             }
             case 12:
             {
-                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
-                readOutput(subReader);
-                delete subReader;
+                READ_SUB_MESSAGE(output, readValueInfo);
                 break;
             }
             default:
             {
+                std::cout << spaces << " field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
                 reader->skip();
                 break;
             }
@@ -157,35 +284,55 @@ void readGraph(BlueSteelLadyBug ::PBReader *reader)
 
 void readModel(BlueSteelLadyBug ::PBReader *reader)
 {
-    std::cout << "+ Read Model\r\n";
+    GETSPACE(8)
 
+    std::cout << "{" << NEWLINE;
     if (reader->readTag())
     {
         do
         {
-            std::cout << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
+            case 1:
+            {
+                readNumber<lb_uint32_t>(reader, "ir_version");
+                break;
+            }
             case 2:
             {
-                readString(reader, "Name");
+                readString(reader, "producer_name");
+                break;
+            }
+            case 3:
+            {
+                readString(reader, "producer_version");
+                break;
+            }
+            case 4:
+            {
+                readString(reader, "domain");
+                break;
+            }
+            case 5:
+            {
+                readNumber<lb_uint32_t>(reader, "model_version");
                 break;
             }
             case 7:
             {
-                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
-                readGraph(subReader);
-                delete subReader;
+                READ_SUB_MESSAGE(graph, readGraph);
                 break;
             }
             default:
             {
+                std::cout << "field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
                 reader->skip();
                 break;
             }
             }
         } while (reader->readTag());
     }
+    std::cout << "}" << NEWLINE;
 };
 int main()
 {

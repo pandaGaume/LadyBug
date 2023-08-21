@@ -237,7 +237,7 @@ bool PBReader::_readValue(lb_int32_t *v, WireType wt)
     }
 }
 
-inline bool PBReader::_readValue(lb_int64_t *v, WireType wt)
+bool PBReader::_readValue(lb_int64_t *v, WireType wt)
 {
     switch (wt)
     {
@@ -345,36 +345,6 @@ bool PBReader::_readValue(lb_double_t *v, WireType wt)
         return false;
     }
     }
-}
-
-inline bool PBReader::readValue(lb_int32_t *v)
-{
-    return _readValue(v, _status.wireType);
-}
-
-inline bool PBReader::readValue(lb_int64_t *v)
-{
-    return _readValue(v, _status.wireType);
-}
-
-inline bool PBReader::readValue(lb_uint32_t *v)
-{
-    return _readValue(v, _status.wireType);
-}
-
-inline bool PBReader::readValue(lb_uint64_t *v)
-{
-    return _readValue(v, _status.wireType);
-}
-
-inline bool PBReader::readValue(lb_float_t *v)
-{
-    return _readValue(v, _status.wireType);
-}
-
-inline bool PBReader::readValue(lb_double_t *v)
-{
-    return _readValue(v, _status.wireType);
 }
 
 bool PBReader::readValue(lb_bool_t *v)
