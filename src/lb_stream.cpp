@@ -6,10 +6,9 @@ int StreamView::read(lb_byte_t *target, int count)
 {
     if (_pos < _size)
     {
-        size_t l = min((size_t)count, remainBytes);
+        size_t l = min((size_t)count, _size - _pos);
         l = _delegate->read(target, l);
         _pos += l;
-        remainBytes -= l;
         return l;
     }
     return LB_EOF;
@@ -17,10 +16,14 @@ int StreamView::read(lb_byte_t *target, int count)
 
 bool StreamView::seek(int value, SeekOrigin origin)
 {
+
     size_t tmp = origin == BEGIN ? value : origin == END ? _size - value
                                                          : _pos + value;
-    _pos = min(max(tmp, 0), _size);
-    _delegate->seek(_pos + _offset, BEGIN);
-    remainBytes = _size - _pos;
+    tmp = min(max(tmp, 0), _size);
+    if (!_delegate->seek(tmp + _offset, BEGIN))
+    {
+        return false;
+    }
+    _pos = tmp;
     return true;
 }

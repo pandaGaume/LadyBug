@@ -25,38 +25,138 @@ char *ReadFileIntoMemory(const char *filename, size_t *fileSize)
     return buffer;
 }
 
-void readGraph(BlueSteelLadyBug ::PBReader *reader)
+void readNode(BlueSteelLadyBug ::PBReader *reader)
 {
-    std::cout << "Read Graph\r\n";
+    char spaces[32];
+    memset((void *)spaces, ' ', reader->getDepth());
+    spaces[reader->getDepth()] = '\0';
+
+    std::cout << spaces << "+ Read Node\r\n";
     if (reader->readTag())
     {
         do
         {
-            std::cout << "field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
-            reader->skip();
+            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
+            switch (reader->getFieldNumber())
+            {
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            }
+        } while (reader->readTag());
+    }
+};
+
+void readInput(BlueSteelLadyBug ::PBReader *reader)
+{
+    char spaces[32];
+    memset((void *)spaces, ' ', reader->getDepth());
+    spaces[reader->getDepth()] = '\0';
+
+    std::cout << "+ Read Input infos\r\n";
+    if (reader->readTag())
+    {
+        do
+        {
+            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
+            switch (reader->getFieldNumber())
+            {
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            }
+        } while (reader->readTag());
+    }
+};
+
+void readOutput(BlueSteelLadyBug ::PBReader *reader)
+{
+    char spaces[32];
+    memset((void *)spaces, ' ', reader->getDepth());
+    spaces[reader->getDepth()] = '\0';
+
+    std::cout << "+ Read Output Infos\r\n";
+    if (reader->readTag())
+    {
+        do
+        {
+            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
+            switch (reader->getFieldNumber())
+            {
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            }
+        } while (reader->readTag());
+    }
+};
+
+void readGraph(BlueSteelLadyBug ::PBReader *reader)
+{
+    char spaces[32];
+    memset((void *)spaces, ' ', reader->getDepth());
+    spaces[reader->getDepth()] = '\0';
+    std::cout << spaces << "+ Read Graph\r\n";
+    if (reader->readTag())
+    {
+        do
+        {
+            std::cout << spaces << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
+            switch (reader->getFieldNumber())
+            {
+            case 1:
+            {
+                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
+                readNode(subReader);
+                delete subReader;
+                break;
+            }
+            case 11:
+            {
+                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
+                readInput(subReader);
+                delete subReader;
+                break;
+            }
+            case 12:
+            {
+                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
+                readOutput(subReader);
+                delete subReader;
+                break;
+            }
+            default:
+            {
+                reader->skip();
+                break;
+            }
+            }
         } while (reader->readTag());
     }
 };
 
 void readModel(BlueSteelLadyBug ::PBReader *reader)
 {
-    std::cout << "Read Model\r\n";
+    std::cout << "+ Read Model\r\n";
 
     if (reader->readTag())
     {
         do
         {
-            std::cout << "field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
+            std::cout << "  field:" << reader->getFieldNumber() << ", wire type:" << (int)reader->getWireType() << "\r\n";
             switch (reader->getFieldNumber())
             {
             case 7:
             {
-                BlueSteelLadyBug ::PBReader *subReader = reader->getSubReader();
-                if (subReader)
-                {
-                    readGraph(subReader);
-                    delete subReader;
-                }
+                BlueSteelLadyBug ::PBReader *subReader = reader->getSubMessageReader();
+                readGraph(subReader);
+                delete subReader;
                 break;
             }
             default:

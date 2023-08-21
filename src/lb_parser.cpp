@@ -15,9 +15,10 @@ bool PBReader::_readPacked(T *v, WireType wt)
             return false;
         }
         _invalidateLengthReaded();
-        size_t end = _status.position + size;
+        size_t pos = getPosition();
+        size_t end = pos + size;
         bool r = true;
-        if (_status.position < end)
+        if (pos < end)
         {
             do
             {
@@ -27,7 +28,7 @@ bool PBReader::_readPacked(T *v, WireType wt)
                     break;
                 }
                 v++;
-            } while (_status.position < end);
+            } while (getPosition() < end);
         }
         return r;
     }
@@ -93,7 +94,7 @@ void PBReader::restore()
     }
 }
 
-PBReader *PBReader::getSubReader()
+PBReader *PBReader::getSubMessageReader()
 {
     lb_uint64_t l;
     if (!readLength(&l))
@@ -102,7 +103,7 @@ PBReader *PBReader::getSubReader()
     }
     _invalidateLengthReaded();
 
-    return new PBSubReader(this, _status.depth + 1, _status.position, l);
+    return new PBSubReader(this, _status.depth + 1, getPosition(), l);
 }
 
 bool PBReader::_readVarint(lb_uint64_t *dest)
@@ -114,7 +115,6 @@ bool PBReader::_readVarint(lb_uint64_t *dest)
         return false;
     }
 
-    _status.position++;
     if (byte & 0x80)
     {
         lb_uint64_t res = byte & 0x7F;
@@ -125,7 +125,6 @@ bool PBReader::_readVarint(lb_uint64_t *dest)
             {
                 return false;
             }
-            _status.position++;
             res |= (lb_uint64_t)(byte & 0x07) << shift;
             if ((byte & 0x80) == 0)
             {
@@ -419,32 +418,39 @@ bool PBReader::readValue(lb_byte_t *v)
 
 bool PBReader::skip()
 {
+    lb_uint64_t size;
+
     switch (_status.wireType)
     {
     case PB_LEN:
     {
-        lb_uint64_t size;
         if (!readLength(&size))
         {
             return false;
         }
         _invalidateLengthReaded();
-        return _input->seek((int)size, CURRENT);
+        break;
     }
     case PB_VARINT:
     {
-        return _readVarint(nullptr);
+        return _readVarint(nullptr); // passing nullptr mean skip
     }
     case PB_32BIT:
     {
-        return _input->seek(4, CURRENT);
+        size = 4;
+        break;
     }
     case PB_64BIT:
     {
-        return _input->seek(8, CURRENT);
+        size = 8;
+        break;
     }
     }
-    return false;
+    if (!_input->seek((int)size, CURRENT))
+    {
+        return false;
+    }
+    return true;
 }
 
 bool PBReader::readValue_s(char *v, int s)

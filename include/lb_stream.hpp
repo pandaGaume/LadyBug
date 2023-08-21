@@ -20,7 +20,9 @@ namespace BlueSteelLadyBug
         virtual int read(lb_byte_t *buf, int count = 1) = 0;
         virtual bool canSeek() = 0;
         virtual bool seek(int value, SeekOrigin origin = BEGIN) = 0;
-        size_t remainBytes;
+        virtual size_t getSize() = 0;
+        virtual size_t getPosition() = 0;
+        virtual size_t getRemainingBytes() = 0;
     };
 
     class StreamView : public IInputStream
@@ -39,6 +41,9 @@ namespace BlueSteelLadyBug
         int read(lb_byte_t *target, int count = 1) override;
         bool seek(int value, SeekOrigin origin = BEGIN) override;
         bool canSeek() override { return _delegate->canSeek(); };
+        size_t getSize() override { return _size; }
+        size_t getPosition() override { return _pos; }
+        size_t getRemainingBytes() override { return _size - _pos; }
 
     private:
         IInputStream *_delegate;

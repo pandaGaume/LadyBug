@@ -17,7 +17,6 @@ namespace BlueSteelLadyBug
     struct ReaderStatus
     {
         lb_uint16_t depth;
-        size_t position;
         WireType wireType;
         lb_uint32_t fieldNumber;
 
@@ -30,11 +29,11 @@ namespace BlueSteelLadyBug
     public:
         PBReader()
         {
-            _status.position = 0;
             _status.wireType = PB_VARINT;
             _status.fieldNumber = 0;
             _status.fieldNumber = 0;
             _status.depth = 0;
+            _status.length = 0;
             _status.lengthReaded = false;
         }
 
@@ -72,7 +71,7 @@ namespace BlueSteelLadyBug
         bool readPacked(lb_float_t *);
         bool readPacked(lb_double_t *);
 
-        PBReader *getSubReader();
+        PBReader *getSubMessageReader();
 
         bool skip();
 
@@ -84,10 +83,11 @@ namespace BlueSteelLadyBug
 
         lb_uint32_t getFieldNumber() { return _status.fieldNumber; }
         WireType getWireType() { return _status.wireType; }
-        size_t getPosition() { return _status.position; }
         lb_byte_t getDepth() { return _status.depth; }
-        size_t getRemainBytes() { return _input->remainBytes; }
         IInputStream *getInput() { return _input; }
+        size_t getPosition() { return _input->getPosition(); }
+        size_t getSize() { return _input->getSize(); }
+        size_t getRemainingBytes() { return _input->getRemainingBytes(); }
 
     protected:
         ReaderStatus _status;
@@ -119,7 +119,7 @@ namespace BlueSteelLadyBug
         PBSubReader(PBReader *r, lb_uint16_t depth, size_t from, size_t length) : _sv(r->getInput(), from, length)
         {
             _status.depth = depth;
-            _input = &_sv;
+            _input = &(this->_sv);
         }
 
     private:
